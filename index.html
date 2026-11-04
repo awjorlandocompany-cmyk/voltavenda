@@ -1,319 +1,210 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="VoltaVenda - Recupere orçamentos e venda mais na sua oficina.">
-  <title>VoltaVenda | Gestão de Orçamentos</title>
-  <style>
-    :root {
-      --bg: #080d0b;
-      --panel: #111a15;
-      --panel2: #17231b;
-      --green: #27d17f;
-      --text: #f1f5f2;
-      --muted: #91a398;
-      --border: #26372d;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 6%;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo { font-size: 23px; font-weight: 800; }
-    .logo span { color: var(--green); }
-
-    .status {
-      color: var(--green);
-      font-size: 12px;
-      background: #153324;
-      padding: 8px 12px;
-      border-radius: 20px;
-    }
-
-    main { max-width: 1100px; margin: auto; padding: 45px 20px; }
-
-    .intro { margin-bottom: 35px; }
-    .intro h1 { font-size: 34px; margin-bottom: 10px; }
-    .intro p { color: var(--muted); line-height: 1.6; }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .card, .section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 20px;
-    }
-
-    .card small { color: var(--muted); }
-    .number { font-size: 29px; font-weight: bold; margin-top: 12px; }
-    .green { color: var(--green); }
-
-    .section { margin-bottom: 25px; }
-    .section h2 { font-size: 19px; margin-top: 0; }
-
-    form {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 13px;
-      background: var(--panel2);
-      color: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      outline: none;
-    }
-
-    button {
-      padding: 13px 17px;
-      background: var(--green);
-      color: #06140c;
-      border: 0;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover { opacity: .88; }
-    .secondary { background: #26372d; color: white; }
-    .table-wrap { overflow-x: auto; }
-
-    table { width: 100%; border-collapse: collapse; min-width: 650px; }
-    th, td {
-      text-align: left;
-      padding: 14px 10px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-    }
-    th { color: var(--muted); }
-
-    .tag {
-      padding: 5px 9px;
-      border-radius: 15px;
-      background: #25372c;
-      color: var(--green);
-      font-size: 11px;
-    }
-
-    .actions { display: flex; gap: 7px; flex-wrap: wrap; }
-    .actions button { padding: 8px 10px; font-size: 12px; }
-
-    .empty { color: var(--muted); padding: 25px 0; text-align: center; }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 30px;
-      font-size: 12px;
-    }
-
-    @media(max-width:600px) {
-      .intro h1 { font-size: 27px; }
-      header { padding: 17px 20px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltaVenda | Gestão de Orçamentos</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d0b;color:#edf5ef;font-family:Arial,sans-serif}
+main{max-width:1050px;margin:35px auto;padding:20px}
+h1{color:#35e58a;margin-bottom:5px}
+.sub{color:#9aada1}
+.card{background:#111b16;border:1px solid #26382d;border-radius:14px;padding:20px;margin:18px 0}
+input,select{width:100%;padding:13px;margin:7px 0 12px;background:#08110c;color:white;border:1px solid #344b3b;border-radius:8px}
+button{padding:12px 17px;border:0;border-radius:8px;background:#28d77c;color:#06130a;font-weight:bold;cursor:pointer;margin:4px}
+button.secondary{background:#26382d;color:white}
+button.danger{background:#793b3b;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.metric{background:#0b140e;padding:18px;border-radius:10px}
+.metric strong{display:block;font-size:25px;color:#35e58a;margin-top:8px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #293a2e}
+.table-wrap{overflow-x:auto}
+.hidden{display:none}
+#message{color:#35e58a;min-height:22px}
+small{color:#a7b7ac}
+</style>
 </head>
 <body>
-
-<header>
-  <div class="logo">Volta<span>Venda</span></div>
-  <div class="status">● Sistema de demonstração</div>
-</header>
-
 <main>
-  <div class="intro">
-    <h1>Recupere vendas que ficaram pelo caminho.</h1>
-    <p>Organize seus orçamentos, acompanhe clientes e retome conversas pelo WhatsApp.</p>
-  </div>
+  <h1>VoltaVenda</h1>
+  <div class="sub">Recupere orçamentos e venda mais serviços.</div>
 
-  <div class="stats">
-    <div class="card">
-      <small>Orçamentos cadastrados</small>
-      <div class="number" id="total">0</div>
-    </div>
-    <div class="card">
-      <small>Em acompanhamento</small>
-      <div class="number green" id="pendentes">0</div>
-    </div>
-    <div class="card">
-      <small>Vendas recuperadas</small>
-      <div class="number green" id="recuperados">0</div>
-    </div>
-    <div class="card">
-      <small>Valor recuperado</small>
-      <div class="number" id="valor">R$ 0,00</div>
-    </div>
-  </div>
-
-  <section class="section">
-    <h2>Novo orçamento</h2>
-    <form id="form">
-      <input id="cliente" placeholder="Nome do cliente" required>
-      <input id="telefone" placeholder="WhatsApp com DDD" required>
-      <input id="servico" placeholder="Serviço / reparo" required>
-      <input id="valorOrcamento" type="number" min="0" step="0.01" placeholder="Valor em R$" required>
-      <select id="statusOrcamento">
-        <option value="Pendente">Pendente</option>
-        <option value="Aprovado">Aprovado</option>
-        <option value="Recuperado">Recuperado</option>
-      </select>
-      <button type="submit">+ Cadastrar orçamento</button>
-    </form>
+  <section id="auth" class="card">
+    <h2>Acesse sua oficina</h2>
+    <label>Nome da oficina (somente para cadastro)</label>
+    <input id="business" placeholder="Nome da oficina">
+    <label>E-mail</label>
+    <input id="email" type="email" placeholder="seu@email.com">
+    <label>Senha</label>
+    <input id="password" type="password" placeholder="Mínimo de 6 caracteres">
+    <button onclick="signup()">Criar conta</button>
+    <button class="secondary" onclick="login()">Entrar</button>
+    <p id="message"></p>
+    <small>No primeiro cadastro, confirme seu e-mail se o Supabase solicitar.</small>
   </section>
 
-  <section class="section">
-    <h2>Orçamentos e acompanhamento</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Serviço</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="lista"></tbody>
-      </table>
+  <section id="app" class="hidden">
+    <div class="row">
+      <span id="welcome"></span>
+      <button class="secondary" onclick="logout()">Sair</button>
     </div>
-    <div id="vazio" class="empty">Nenhum orçamento cadastrado ainda.</div>
+
+    <section class="grid">
+      <div class="metric">Orçamentos<strong id="total">0</strong></div>
+      <div class="metric">Pendentes<strong id="pending">0</strong></div>
+      <div class="metric">Recuperados<strong id="recovered">0</strong></div>
+      <div class="metric">Valor recuperado<strong id="amount">R$ 0,00</strong></div>
+    </section>
+
+    <section class="card">
+      <h2>Novo orçamento</h2>
+      <input id="customer" placeholder="Nome do cliente">
+      <input id="phone" placeholder="WhatsApp com DDD (ex.: 11999999999)">
+      <input id="service" placeholder="Serviço (ex.: troca de óleo)">
+      <input id="value" type="number" min="0" step="0.01" placeholder="Valor do orçamento em R$">
+      <button onclick="addQuote()">Salvar orçamento</button>
+      <p id="appmessage"></p>
+    </section>
+
+    <section class="card">
+      <h2>Orçamentos cadastrados</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="quotes"></tbody>
+        </table>
+      </div>
+    </section>
   </section>
 </main>
 
-<footer>VoltaVenda © 2026 — Gestão inteligente de orçamentos</footer>
-
 <script>
-  const STORAGE_KEY = "voltavenda_orcamentos_v1";
-  let orcamentos = [];
+const SUPABASE_URL = "https://phxguikugvfengatatqw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_BEvxfPpJNm-GyODaKiZf4w_Ul6WVzji";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  try {
-    orcamentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    if (!Array.isArray(orcamentos)) orcamentos = [];
-  } catch {
-    orcamentos = [];
-  }
+let currentUser = null;
+let records = [];
 
-  const dinheiro = valor => Number(valor).toLocaleString("pt-BR", {
-    style: "currency", currency: "BRL"
+function msg(id,text){document.getElementById(id).textContent=text;}
+
+async function signup(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  const business=document.getElementById("business").value.trim() || "Minha oficina";
+  if(!email || password.length<6){msg("message","Informe e-mail e senha com pelo menos 6 caracteres.");return;}
+  msg("message","Criando conta...");
+  const {data,error}=await db.auth.signUp({
+    email,password,
+    options:{data:{business_name:business}}
   });
+  if(error){msg("message",error.message);return;}
+  if(data.session){await startApp(data.session.user);}
+  else{msg("message","Conta criada! Confira seu e-mail para confirmar o cadastro e depois entre.");}
+}
 
-  function salvar() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(orcamentos));
-    renderizar();
+async function login(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  msg("message","Entrando...");
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  if(error){msg("message",error.message);return;}
+  await startApp(data.user);
+}
+
+async function logout(){
+  await db.auth.signOut();
+  currentUser=null;
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("auth").classList.remove("hidden");
+}
+
+async function startApp(user){
+  currentUser=user;
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("welcome").textContent="Oficina: "+(user.user_metadata.business_name || user.email);
+  await loadQuotes();
+}
+
+async function loadQuotes(){
+  const {data,error}=await db.from("quotes").select("*").order("created_at",{ascending:false});
+  if(error){msg("appmessage","Erro ao carregar: "+error.message);return;}
+  records=data || [];
+  render();
+}
+
+async function addQuote(){
+  const customer_name=document.getElementById("customer").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+  const service=document.getElementById("service").value.trim();
+  const amount=Number(document.getElementById("value").value);
+  if(!customer_name || !phone || !service || !Number.isFinite(amount) || amount<0){
+    msg("appmessage","Preencha todos os campos corretamente.");return;
   }
-
-  function renderizar() {
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
-
-    orcamentos.forEach(item => {
-      const tr = document.createElement("tr");
-
-      [item.cliente, item.servico, dinheiro(item.valor), item.status].forEach(texto => {
-        const td = document.createElement("td");
-        td.textContent = texto;
-        tr.appendChild(td);
-      });
-
-      const acoes = document.createElement("td");
-      acoes.className = "actions";
-
-      const whatsapp = document.createElement("button");
-      whatsapp.textContent = "WhatsApp";
-      whatsapp.className = "secondary";
-      whatsapp.onclick = () => {
-        const telefone = item.telefone.replace(/\D/g, "");
-        const numero = telefone.startsWith("55") ? telefone : "55" + telefone;
-        const mensagem = `Olá, ${item.cliente}! Gostaria de saber se ainda podemos ajudar com o orçamento de ${item.servico}.`;
-        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem), "_blank", "noopener");
-      };
-
-      const status = document.createElement("button");
-      status.textContent = "Alterar status";
-      status.className = "secondary";
-      status.onclick = () => {
-        const opcoes = ["Pendente", "Aprovado", "Recuperado"];
-        const atual = opcoes.indexOf(item.status);
-        item.status = opcoes[(atual + 1) % opcoes.length];
-        salvar();
-      };
-
-      const excluir = document.createElement("button");
-      excluir.textContent = "Excluir";
-      excluir.className = "secondary";
-      excluir.onclick = () => {
-        if (confirm("Excluir este orçamento?")) {
-          orcamentos = orcamentos.filter(o => o.id !== item.id);
-          salvar();
-        }
-      };
-
-      acoes.append(whatsapp, status, excluir);
-      tr.appendChild(acoes);
-      lista.appendChild(tr);
-    });
-
-    document.getElementById("vazio").style.display = orcamentos.length ? "none" : "block";
-    document.getElementById("total").textContent = orcamentos.length;
-    document.getElementById("pendentes").textContent =
-      orcamentos.filter(o => o.status === "Pendente").length;
-    document.getElementById("recuperados").textContent =
-      orcamentos.filter(o => o.status === "Recuperado").length;
-
-    const total = orcamentos
-      .filter(o => o.status === "Recuperado")
-      .reduce((soma, o) => soma + Number(o.valor), 0);
-
-    document.getElementById("valor").textContent = dinheiro(total);
-  }
-
-  document.getElementById("form").addEventListener("submit", event => {
-    event.preventDefault();
-
-    const item = {
-      id: crypto.randomUUID(),
-      cliente: document.getElementById("cliente").value.trim(),
-      telefone: document.getElementById("telefone").value.trim(),
-      servico: document.getElementById("servico").value.trim(),
-      valor: Number(document.getElementById("valorOrcamento").value),
-      status: document.getElementById("statusOrcamento").value
-    };
-
-    if (!item.cliente || !item.telefone || !item.servico || item.valor < 0) {
-      alert("Confira os dados do orçamento.");
-      return;
-    }
-
-    orcamentos.push(item);
-    salvar();
-    event.target.reset();
+  msg("appmessage","Salvando...");
+  const {error}=await db.from("quotes").insert({
+    workshop_id:currentUser.id,customer_name,phone,service,amount,status:"Pendente"
   });
+  if(error){msg("appmessage","Erro ao salvar: "+error.message);return;}
+  ["customer","phone","service","value"].forEach(id=>document.getElementById(id).value="");
+  msg("appmessage","Orçamento salvo na nuvem!");
+  await loadQuotes();
+}
 
-  renderizar();
+async function changeStatus(id,status){
+  const {error}=await db.from("quotes").update({status}).eq("id",id);
+  if(error){msg("appmessage","Erro ao atualizar: "+error.message);return;}
+  await loadQuotes();
+}
+
+async function removeQuote(id){
+  if(!confirm("Deseja excluir este orçamento?"))return;
+  const {error}=await db.from("quotes").delete().eq("id",id);
+  if(error){msg("appmessage","Erro ao excluir: "+error.message);return;}
+  await loadQuotes();
+}
+
+function render(){
+  const pending=records.filter(x=>x.status==="Pendente").length;
+  const recovered=records.filter(x=>x.status==="Recuperado");
+  document.getElementById("total").textContent=records.length;
+  document.getElementById("pending").textContent=pending;
+  document.getElementById("recovered").textContent=recovered.length;
+  document.getElementById("amount").textContent=recovered.reduce((s,x)=>s+Number(x.amount),0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  document.getElementById("quotes").innerHTML=records.map(x=>`
+    <tr>
+      <td>${escapeHTML(x.customer_name)}<br><small>${escapeHTML(x.phone)}</small></td>
+      <td>${escapeHTML(x.service)}</td>
+      <td>${Number(x.amount).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</td>
+      <td>${escapeHTML(x.status)}</td>
+      <td>
+        <button onclick="whatsapp('${encodeURIComponent(x.phone)}','${encodeURIComponent(x.customer_name)}','${encodeURIComponent(x.service)}')">WhatsApp</button>
+        <button class="secondary" onclick="changeStatus('${x.id}','${x.status==="Recuperado"?"Pendente":"Recuperado"}')">${x.status==="Recuperado"?"Voltar":"Recuperado"}</button>
+        <button class="danger" onclick="removeQuote('${x.id}')">Excluir</button>
+      </td>
+    </tr>`).join("");
+}
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function whatsapp(phone,name,service){
+  const p=decodeURIComponent(phone).replace(/\D/g,"");
+  const n=decodeURIComponent(name);
+  const s=decodeURIComponent(service);
+  const number=p.startsWith("55")?p:"55"+p;
+  const message=encodeURIComponent(`Olá, ${n}! Tudo bem? Estamos passando para saber se deseja seguir com o orçamento de ${s}. Podemos ajudar?`);
+  window.open(`https://wa.me/${number}?text=${message}`,"_blank");
+}
+
+db.auth.getSession().then(({data})=>{
+  if(data.session)startApp(data.session.user);
+});
 </script>
 </body>
 </html>
