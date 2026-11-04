@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VoltaVenda - Recupere orçamentos e venda mais na sua oficina.">
+  <title>VoltaVenda | Gestão de Orçamentos</title>
+  <style>
+    :root {
+      --bg: #080d0b;
+      --panel: #111a15;
+      --panel2: #17231b;
+      --green: #27d17f;
+      --text: #f1f5f2;
+      --muted: #91a398;
+      --border: #26372d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 6%;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo { font-size: 23px; font-weight: 800; }
+    .logo span { color: var(--green); }
+
+    .status {
+      color: var(--green);
+      font-size: 12px;
+      background: #153324;
+      padding: 8px 12px;
+      border-radius: 20px;
+    }
+
+    main { max-width: 1100px; margin: auto; padding: 45px 20px; }
+
+    .intro { margin-bottom: 35px; }
+    .intro h1 { font-size: 34px; margin-bottom: 10px; }
+    .intro p { color: var(--muted); line-height: 1.6; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .card, .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 20px;
+    }
+
+    .card small { color: var(--muted); }
+    .number { font-size: 29px; font-weight: bold; margin-top: 12px; }
+    .green { color: var(--green); }
+
+    .section { margin-bottom: 25px; }
+    .section h2 { font-size: 19px; margin-top: 0; }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      background: var(--panel2);
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      padding: 13px 17px;
+      background: var(--green);
+      color: #06140c;
+      border: 0;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover { opacity: .88; }
+    .secondary { background: #26372d; color: white; }
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    th, td {
+      text-align: left;
+      padding: 14px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    th { color: var(--muted); }
+
+    .tag {
+      padding: 5px 9px;
+      border-radius: 15px;
+      background: #25372c;
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    .actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .actions button { padding: 8px 10px; font-size: 12px; }
+
+    .empty { color: var(--muted); padding: 25px 0; text-align: center; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px;
+      font-size: 12px;
+    }
+
+    @media(max-width:600px) {
+      .intro h1 { font-size: 27px; }
+      header { padding: 17px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Volta<span>Venda</span></div>
+  <div class="status">● Sistema de demonstração</div>
+</header>
+
+<main>
+  <div class="intro">
+    <h1>Recupere vendas que ficaram pelo caminho.</h1>
+    <p>Organize seus orçamentos, acompanhe clientes e retome conversas pelo WhatsApp.</p>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <small>Orçamentos cadastrados</small>
+      <div class="number" id="total">0</div>
+    </div>
+    <div class="card">
+      <small>Em acompanhamento</small>
+      <div class="number green" id="pendentes">0</div>
+    </div>
+    <div class="card">
+      <small>Vendas recuperadas</small>
+      <div class="number green" id="recuperados">0</div>
+    </div>
+    <div class="card">
+      <small>Valor recuperado</small>
+      <div class="number" id="valor">R$ 0,00</div>
+    </div>
+  </div>
+
+  <section class="section">
+    <h2>Novo orçamento</h2>
+    <form id="form">
+      <input id="cliente" placeholder="Nome do cliente" required>
+      <input id="telefone" placeholder="WhatsApp com DDD" required>
+      <input id="servico" placeholder="Serviço / reparo" required>
+      <input id="valorOrcamento" type="number" min="0" step="0.01" placeholder="Valor em R$" required>
+      <select id="statusOrcamento">
+        <option value="Pendente">Pendente</option>
+        <option value="Aprovado">Aprovado</option>
+        <option value="Recuperado">Recuperado</option>
+      </select>
+      <button type="submit">+ Cadastrar orçamento</button>
+    </form>
+  </section>
+
+  <section class="section">
+    <h2>Orçamentos e acompanhamento</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Serviço</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+    <div id="vazio" class="empty">Nenhum orçamento cadastrado ainda.</div>
+  </section>
+</main>
+
+<footer>VoltaVenda © 2026 — Gestão inteligente de orçamentos</footer>
+
+<script>
+  const STORAGE_KEY = "voltavenda_orcamentos_v1";
+  let orcamentos = [];
+
+  try {
+    orcamentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if (!Array.isArray(orcamentos)) orcamentos = [];
+  } catch {
+    orcamentos = [];
+  }
+
+  const dinheiro = valor => Number(valor).toLocaleString("pt-BR", {
+    style: "currency", currency: "BRL"
+  });
+
+  function salvar() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orcamentos));
+    renderizar();
+  }
+
+  function renderizar() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    orcamentos.forEach(item => {
+      const tr = document.createElement("tr");
+
+      [item.cliente, item.servico, dinheiro(item.valor), item.status].forEach(texto => {
+        const td = document.createElement("td");
+        td.textContent = texto;
+        tr.appendChild(td);
+      });
+
+      const acoes = document.createElement("td");
+      acoes.className = "actions";
+
+      const whatsapp = document.createElement("button");
+      whatsapp.textContent = "WhatsApp";
+      whatsapp.className = "secondary";
+      whatsapp.onclick = () => {
+        const telefone = item.telefone.replace(/\D/g, "");
+        const numero = telefone.startsWith("55") ? telefone : "55" + telefone;
+        const mensagem = `Olá, ${item.cliente}! Gostaria de saber se ainda podemos ajudar com o orçamento de ${item.servico}.`;
+        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem), "_blank", "noopener");
+      };
+
+      const status = document.createElement("button");
+      status.textContent = "Alterar status";
+      status.className = "secondary";
+      status.onclick = () => {
+        const opcoes = ["Pendente", "Aprovado", "Recuperado"];
+        const atual = opcoes.indexOf(item.status);
+        item.status = opcoes[(atual + 1) % opcoes.length];
+        salvar();
+      };
+
+      const excluir = document.createElement("button");
+      excluir.textContent = "Excluir";
+      excluir.className = "secondary";
+      excluir.onclick = () => {
+        if (confirm("Excluir este orçamento?")) {
+          orcamentos = orcamentos.filter(o => o.id !== item.id);
+          salvar();
+        }
+      };
+
+      acoes.append(whatsapp, status, excluir);
+      tr.appendChild(acoes);
+      lista.appendChild(tr);
+    });
+
+    document.getElementById("vazio").style.display = orcamentos.length ? "none" : "block";
+    document.getElementById("total").textContent = orcamentos.length;
+    document.getElementById("pendentes").textContent =
+      orcamentos.filter(o => o.status === "Pendente").length;
+    document.getElementById("recuperados").textContent =
+      orcamentos.filter(o => o.status === "Recuperado").length;
+
+    const total = orcamentos
+      .filter(o => o.status === "Recuperado")
+      .reduce((soma, o) => soma + Number(o.valor), 0);
+
+    document.getElementById("valor").textContent = dinheiro(total);
+  }
+
+  document.getElementById("form").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const item = {
+      id: crypto.randomUUID(),
+      cliente: document.getElementById("cliente").value.trim(),
+      telefone: document.getElementById("telefone").value.trim(),
+      servico: document.getElementById("servico").value.trim(),
+      valor: Number(document.getElementById("valorOrcamento").value),
+      status: document.getElementById("statusOrcamento").value
+    };
+
+    if (!item.cliente || !item.telefone || !item.servico || item.valor < 0) {
+      alert("Confira os dados do orçamento.");
+      return;
+    }
+
+    orcamentos.push(item);
+    salvar();
+    event.target.reset();
+  });
+
+  renderizar();
+</script>
+</body>
+</html>
