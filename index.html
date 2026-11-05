@@ -1,330 +1,63 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltaVenda | Recupere mais vendas</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#080d0b;color:#edf5ef;font-family:Arial,sans-serif}
-main{max-width:1100px;margin:auto;padding:22px}
-h1,h2,h3{line-height:1.2}
-h1{color:#35e58a;font-size:42px}
-h2{font-size:27px}
-p{line-height:1.6;color:#b8c8bd}
-button{padding:13px 19px;border:0;border-radius:8px;background:#28d77c;color:#06130a;font-weight:bold;cursor:pointer;margin:4px}
-button:hover{opacity:.88}
-button:disabled{opacity:.5;cursor:not-allowed}
-.secondary{background:#26382d;color:white}
-.danger{background:#793b3b;color:white}
-.card{background:#111b16;border:1px solid #26382d;border-radius:14px;padding:22px;margin:18px 0}
-.hero{padding:65px 20px;text-align:center;background:linear-gradient(145deg,#10271a,#080d0b);border:1px solid #26382d;border-radius:18px;margin-top:25px}
-.hero p{max-width:650px;margin:15px auto 25px}
-.green{color:#35e58a}
-.sub{color:#9aada1}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}
-.metric{background:#0b140e;padding:19px;border-radius:10px}
-.metric strong{display:block;font-size:25px;color:#35e58a;margin-top:8px}
-input,select{width:100%;padding:13px;margin:7px 0 12px;background:#08110c;color:white;border:1px solid #344b3b;border-radius:8px}
-label{font-size:14px;color:#b8c8bd}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{text-align:left;padding:12px;border-bottom:1px solid #293a2e}
-.table-wrap{overflow-x:auto}
-.hidden{display:none!important}
-#message,#appmessage,#paymentMessage{color:#35e58a;min-height:22px}
-small{color:#a7b7ac}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-header h2{margin:0;color:#35e58a}
-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-nav a{color:#dcebe0;text-decoration:none;font-size:14px}
-.sim-result{font-size:34px;color:#35e58a;font-weight:bold;margin:12px 0}
-.feature{padding:18px;background:#0b140e;border-radius:10px}
-footer{text-align:center;padding:30px;color:#82978a}
-@media(max-width:600px){h1{font-size:32px}.hero{padding:35px 15px}main{padding:13px}}
-</style>
-</head>
-<body>
-<main>
-<header>
-  <h2>VoltaVenda</h2>
-  <nav>
-    <a href="#como-funciona">Como funciona</a>
-    <a href="#simulador">Simulador</a>
-    <button onclick="showLogin()">Acesso da oficina</button>
-  </nav>
-</header>
+async function checkSubscription(){
+  const content = document.getElementById("appContent");
+  const required = document.getElementById("subscriptionRequired");
+  const paymentMessage = document.getElementById("paymentMessage");
 
-<section id="landing">
-  <div class="hero">
-    <p class="green"><strong>MAIS CONTROLE. MENOS ORÇAMENTOS ESQUECIDOS.</strong></p>
-    <h1>Quantos clientes sua oficina está deixando escapar?</h1>
-    <p>O VoltaVenda ajuda oficinas mecânicas a acompanhar orçamentos pendentes, entrar em contato com clientes pelo WhatsApp e identificar serviços recuperados.</p>
-    <button onclick="showLogin()">Conhecer o sistema</button>
-    <button class="secondary" onclick="document.getElementById('simulador').scrollIntoView({behavior:'smooth'})">Calcular meu potencial</button>
-  </div>
+  content.classList.add("hidden");
+  required.classList.add("hidden");
 
-  <section id="como-funciona" class="card">
-    <h2>Como funciona</h2>
-    <div class="grid">
-      <div class="feature"><h3 class="green">01. Cadastre</h3><p>Registre os orçamentos que sua oficina apresenta aos clientes.</p></div>
-      <div class="feature"><h3 class="green">02. Acompanhe</h3><p>Identifique os orçamentos que ainda estão pendentes.</p></div>
-      <div class="feature"><h3 class="green">03. Entre em contato</h3><p>Gere mensagens de acompanhamento para enviar pelo WhatsApp.</p></div>
-      <div class="feature"><h3 class="green">04. Meça</h3><p>Marque os serviços recuperados e acompanhe os valores.</p></div>
-    </div>
-  </section>
+  const { data, error } = await db
+    .from("subscriptions")
+    .select("status,current_period_end")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
 
-  <section id="simulador" class="card">
-    <h2>Quanto sua oficina poderia recuperar?</h2>
-    <p>Faça uma simulação usando os números da sua oficina.</p>
-    <label>Quantos orçamentos sua oficina faz por mês?</label>
-    <input id="simQuotes" type="number" min="0" value="100">
-    <label>Qual o valor médio de cada orçamento? (R$)</label>
-    <input id="simValue" type="number" min="0" step="0.01" value="500">
-    <label>Qual percentual deseja simular como recuperação?</label>
-    <select id="simRate">
-      <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option><option value="25">25%</option><option value="30">30%</option>
-    </select>
-    <button onclick="calculate()">Calcular potencial</button>
-    <div class="feature">
-      <small>VALOR POTENCIALMENTE RECUPERÁVEL POR MÊS</small>
-      <div id="simResult" class="sim-result">R$ 10.000,00</div>
-      <p id="simDetails">Simulação ilustrativa: 20 orçamentos recuperados.</p>
-    </div>
-    <small>Esta é uma estimativa matemática, não uma promessa de resultado. A recuperação real depende da oficina, dos clientes e dos contatos realizados.</small>
-  </section>
-
-  <section class="card" style="text-align:center">
-    <h2>Não deixe seus orçamentos parados.</h2>
-    <p>Organize seus contatos e acompanhe suas oportunidades em um só lugar.</p>
-    <button onclick="showLogin()">Acessar VoltaVenda</button>
-  </section>
-</section>
-
-<section id="auth" class="card hidden">
-  <h2>Acesse sua oficina</h2>
-  <p>Entre na sua conta ou cadastre sua oficina.</p>
-  <label>Nome da oficina (somente para cadastro)</label>
-  <input id="business" placeholder="Nome da oficina">
-  <label>E-mail</label>
-  <input id="email" type="email" placeholder="seu@email.com">
-  <label>Senha</label>
-  <input id="password" type="password" placeholder="Mínimo de 6 caracteres">
-  <button onclick="signup()">Criar conta</button>
-  <button class="secondary" onclick="login()">Entrar</button>
-  <button class="secondary" onclick="showLanding()">Voltar ao início</button>
-  <p id="message"></p>
-  <small>No primeiro cadastro, confirme seu e-mail se o Supabase solicitar.</small>
-</section>
-
-<section id="app" class="hidden">
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <span id="welcome"></span>
-    <button class="secondary" onclick="logout()">Sair</button>
-  </div>
-
-  <section class="card">
-    <h2>Plano VoltaVenda</h2>
-    <p>Assinatura mensal: <strong class="green">R$ 49,90</strong></p>
-    <p>Tenha acesso ao sistema para organizar e acompanhar os orçamentos da sua oficina.</p>
-    <button id="subscribeButton" onclick="subscribe()">Assinar VoltaVenda</button>
-    <p id="paymentMessage"></p>
-  </section>
-
-  <section class="grid">
-    <div class="metric">Orçamentos<strong id="total">0</strong></div>
-    <div class="metric">Pendentes<strong id="pending">0</strong></div>
-    <div class="metric">Recuperados<strong id="recovered">0</strong></div>
-    <div class="metric">Valor recuperado<strong id="amount">R$ 0,00</strong></div>
-  </section>
-
-  <section class="card">
-    <h2>Novo orçamento</h2>
-    <input id="customer" placeholder="Nome do cliente">
-    <input id="phone" placeholder="WhatsApp com DDD (ex.: 11999999999)">
-    <input id="service" placeholder="Serviço (ex.: troca de óleo)">
-    <input id="value" type="number" min="0" step="0.01" placeholder="Valor do orçamento em R$">
-    <button onclick="addQuote()">Salvar orçamento</button>
-    <p id="appmessage"></p>
-  </section>
-
-  <section class="card">
-    <h2>Orçamentos cadastrados</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody id="quotes"></tbody>
-      </table>
-    </div>
-  </section>
-</section>
-
-<footer>VoltaVenda © 2026 — Gestão e recuperação de orçamentos.</footer>
-</main>
-
-<script>
-const SUPABASE_URL = "https://phxguikugvfengatatqw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_BEvxfPpJNm-GyODaKiZf4w_Ul6WVzji";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let currentUser = null;
-let records = [];
-
-function msg(id,text){document.getElementById(id).textContent=text;}
-
-/* PAGAMENTO STRIPE */
-async function subscribe(){
-  const button=document.getElementById("subscribeButton");
-  const paymentMessage=document.getElementById("paymentMessage");
-
-  if(!currentUser){
-    paymentMessage.textContent="Entre na sua conta para assinar.";
-    return;
+  if(error){
+    console.error("Erro ao verificar assinatura:", error);
+    required.classList.remove("hidden");
+    required.querySelector("p").textContent =
+      "Não foi possível verificar sua assinatura. Tente novamente.";
+    paymentMessage.textContent = "Erro ao consultar assinatura.";
+    return false;
   }
 
-  button.disabled=true;
-  paymentMessage.textContent="Preparando pagamento...";
-
-  try{
-    const {data,error}=await db.functions.invoke("create-checkout-");
-
-    if(error){
-      console.error("Erro ao criar checkout:",error);
-      paymentMessage.textContent="Falha ao iniciar pagamento. Consulte os registros da função no Supabase.";
-      button.disabled=false;
-      return;
-    }
-
-    if(!data || !data.url){
-      paymentMessage.textContent="O Stripe não retornou o link de pagamento.";
-      button.disabled=false;
-      return;
-    }
-
-    window.location.href=data.url;
-  }catch(error){
-    console.error(error);
-    paymentMessage.textContent="Erro de conexão. Tente novamente.";
-    button.disabled=false;
+  if(!data){
+    required.classList.remove("hidden");
+    paymentMessage.textContent = "Você ainda não possui uma assinatura.";
+    return false;
   }
+
+  const validStatus = ["active", "trialing"].includes(data.status);
+
+  const validPeriod =
+    !data.current_period_end ||
+    new Date(data.current_period_end).getTime() > Date.now();
+
+  if(!validStatus || !validPeriod){
+    required.classList.remove("hidden");
+    paymentMessage.textContent =
+      "Sua assinatura não está ativa. Regularize para acessar o sistema.";
+    return false;
+  }
+
+  required.classList.add("hidden");
+  content.classList.remove("hidden");
+  paymentMessage.textContent = "Assinatura ativa. Acesso liberado.";
+
+  await loadQuotes();
+
+  return true;
 }
 
-function showLogin(){
-  document.getElementById("landing").classList.add("hidden");
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("auth").classList.remove("hidden");
-  window.scrollTo(0,0);
-}
-function showLanding(){
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("landing").classList.remove("hidden");
-  window.scrollTo(0,0);
-}
-function calculate(){
-  const quantity=Math.max(0,Number(document.getElementById("simQuotes").value)||0);
-  const average=Math.max(0,Number(document.getElementById("simValue").value)||0);
-  const rate=Number(document.getElementById("simRate").value)/100;
-  const recovered=quantity*rate;
-  const total=recovered*average;
-  document.getElementById("simResult").textContent=total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-  document.getElementById("simDetails").textContent="Simulação de "+Math.round(recovered)+" orçamentos recuperados, de um total de "+quantity+" orçamentos mensais.";
-}
-async function signup(){
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-  const business=document.getElementById("business").value.trim() || "Minha oficina";
-  if(!email || password.length<6){msg("message","Informe e-mail e senha com pelo menos 6 caracteres.");return;}
-  msg("message","Criando conta...");
-  const {data,error}=await db.auth.signUp({email,password,options:{data:{business_name:business}}});
-  if(error){msg("message",error.message);return;}
-  if(data.session){await startApp(data.session.user);}
-  else{msg("message","Conta criada! Confira seu e-mail para confirmar o cadastro e depois entre.");}
-}
-async function login(){
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-  msg("message","Entrando...");
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error){msg("message",error.message);return;}
-  await startApp(data.user);
-}
-async function logout(){
-  await db.auth.signOut();currentUser=null;records=[];
-  document.getElementById("app").classList.add("hidden");showLanding();
-}
 async function startApp(user){
-  currentUser=user;
+  currentUser = user;
+
   document.getElementById("landing").classList.add("hidden");
   document.getElementById("auth").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-  document.getElementById("welcome").textContent="Oficina: "+(user.user_metadata.business_name || user.email);
-  await loadQuotes();
+
+  document.getElementById("welcome").textContent =
+    "Oficina: " + (user.user_metadata.business_name || user.email);
+
+  await checkSubscription();
 }
-async function loadQuotes(){
-  const {data,error}=await db.from("quotes").select("*").order("created_at",{ascending:false});
-  if(error){msg("appmessage","Erro ao carregar: "+error.message);return;}
-  records=data || [];render();
-}
-async function addQuote(){
-  if(!currentUser)return;
-  const customer_name=document.getElementById("customer").value.trim();
-  const phone=document.getElementById("phone").value.trim();
-  const service=document.getElementById("service").value.trim();
-  const amount=Number(document.getElementById("value").value);
-  if(!customer_name || !phone || !service || document.getElementById("value").value==="" || !Number.isFinite(amount) || amount<0){
-    msg("appmessage","Preencha todos os campos corretamente.");return;
-  }
-  msg("appmessage","Salvando...");
-  const {error}=await db.from("quotes").insert({workshop_id:currentUser.id,customer_name,phone,service,amount,status:"Pendente"});
-  if(error){msg("appmessage","Erro ao salvar: "+error.message);return;}
-  ["customer","phone","service","value"].forEach(id=>{document.getElementById(id).value="";});
-  msg("appmessage","Orçamento salvo na nuvem!");await loadQuotes();
-}
-async function changeStatus(id,status){
-  const {error}=await db.from("quotes").update({status}).eq("id",id);
-  if(error){msg("appmessage","Erro ao atualizar: "+error.message);return;}
-  await loadQuotes();
-}
-async function removeQuote(id){
-  if(!confirm("Deseja excluir este orçamento?"))return;
-  const {error}=await db.from("quotes").delete().eq("id",id);
-  if(error){msg("appmessage","Erro ao excluir: "+error.message);return;}
-  await loadQuotes();
-}
-function render(){
-  const pending=records.filter(x=>x.status==="Pendente").length;
-  const recovered=records.filter(x=>x.status==="Recuperado");
-  document.getElementById("total").textContent=records.length;
-  document.getElementById("pending").textContent=pending;
-  document.getElementById("recovered").textContent=recovered.length;
-  document.getElementById("amount").textContent=recovered.reduce((s,x)=>s+Number(x.amount),0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-  document.getElementById("quotes").innerHTML=records.map(x=>`
-    <tr>
-      <td>${escapeHTML(x.customer_name)}<br><small>${escapeHTML(x.phone)}</small></td>
-      <td>${escapeHTML(x.service)}</td>
-      <td>${Number(x.amount).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</td>
-      <td>${escapeHTML(x.status)}</td>
-      <td>
-        <button onclick="whatsapp('${encodeURIComponent(x.phone)}','${encodeURIComponent(x.customer_name)}','${encodeURIComponent(x.service)}')">WhatsApp</button>
-        <button class="secondary" onclick="changeStatus('${x.id}','${x.status==="Recuperado"?"Pendente":"Recuperado"}')">${x.status==="Recuperado"?"Voltar":"Recuperado"}</button>
-        <button class="danger" onclick="removeQuote('${x.id}')">Excluir</button>
-      </td>
-    </tr>`).join("");
-}
-function escapeHTML(value){
-  return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function whatsapp(phone,name,service){
-  const p=decodeURIComponent(phone).replace(/\D/g,"");
-  const n=decodeURIComponent(name);
-  const s=decodeURIComponent(service);
-  const number=p.startsWith("55")?p:"55"+p;
-  const message=encodeURIComponent(`Olá, ${n}! Tudo bem? Estamos passando para saber se deseja seguir com o orçamento de ${s}. Podemos ajudar?`);
-  window.open(`https://wa.me/${number}?text=${message}`,"_blank");
-}
-calculate();
-db.auth.getSession().then(({data})=>{if(data.session)startApp(data.session.user);});
-</script>
-</body>
-</html>
