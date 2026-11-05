@@ -15,6 +15,7 @@ h2{font-size:27px}
 p{line-height:1.6;color:#b8c8bd}
 button{padding:13px 19px;border:0;border-radius:8px;background:#28d77c;color:#06130a;font-weight:bold;cursor:pointer;margin:4px}
 button:hover{opacity:.88}
+button:disabled{opacity:.5;cursor:not-allowed}
 .secondary{background:#26382d;color:white}
 .danger{background:#793b3b;color:white}
 .card{background:#111b16;border:1px solid #26382d;border-radius:14px;padding:22px;margin:18px 0}
@@ -31,7 +32,7 @@ table{width:100%;border-collapse:collapse;min-width:650px}
 th,td{text-align:left;padding:12px;border-bottom:1px solid #293a2e}
 .table-wrap{overflow-x:auto}
 .hidden{display:none!important}
-#message,#appmessage{color:#35e58a;min-height:22px}
+#message,#appmessage,#paymentMessage{color:#35e58a;min-height:22px}
 small{color:#a7b7ac}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 header h2{margin:0;color:#35e58a}
@@ -152,6 +153,15 @@ footer{text-align:center;padding:30px;color:#82978a}
     <button class="secondary" onclick="logout()">Sair</button>
   </div>
 
+  <!-- ASSINATURA -->
+  <section class="card">
+    <h2>Plano VoltaVenda</h2>
+    <p>Assinatura mensal: <strong class="green">R$ 49,90</strong></p>
+    <p>Tenha acesso ao sistema para organizar e acompanhar os orçamentos da sua oficina.</p>
+    <button id="subscribeButton" onclick="subscribe()">Assinar VoltaVenda</button>
+    <p id="paymentMessage"></p>
+  </section>
+
   <section class="grid">
     <div class="metric">Orçamentos<strong id="total">0</strong></div>
     <div class="metric">Pendentes<strong id="pending">0</strong></div>
@@ -198,6 +208,44 @@ let records = [];
 
 function msg(id,text){
   document.getElementById(id).textContent=text;
+}
+
+/* PAGAMENTO STRIPE */
+async function subscribe(){
+  const button=document.getElementById("subscribeButton");
+  const paymentMessage=document.getElementById("paymentMessage");
+
+  if(!currentUser){
+    paymentMessage.textContent="Entre na sua conta para assinar.";
+    return;
+  }
+
+  button.disabled=true;
+  paymentMessage.textContent="Preparando pagamento...";
+
+  try{
+    const {data,error}=await db.functions.invoke("create-checkout");
+
+    if(error){
+      console.error("Erro ao criar checkout:",error);
+      paymentMessage.textContent="Não foi possível iniciar o pagamento. Tente entrar novamente.";
+      button.disabled=false;
+      return;
+    }
+
+    if(!data || !data.url){
+      paymentMessage.textContent="O Stripe não retornou o link de pagamento.";
+      button.disabled=false;
+      return;
+    }
+
+    window.location.href=data.url;
+
+  }catch(error){
+    console.error(error);
+    paymentMessage.textContent="Erro de conexão. Tente novamente.";
+    button.disabled=false;
+  }
 }
 
 function showLogin(){
