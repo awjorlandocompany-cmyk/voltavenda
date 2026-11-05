@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -46,7 +47,6 @@ footer{text-align:center;padding:30px;color:#82978a}
 </head>
 <body>
 <main>
-
 <header>
   <h2>VoltaVenda</h2>
   <nav>
@@ -56,7 +56,6 @@ footer{text-align:center;padding:30px;color:#82978a}
   </nav>
 </header>
 
-<!-- PÁGINA COMERCIAL -->
 <section id="landing">
   <div class="hero">
     <p class="green"><strong>MAIS CONTROLE. MENOS ORÇAMENTOS ESQUECIDOS.</strong></p>
@@ -69,47 +68,25 @@ footer{text-align:center;padding:30px;color:#82978a}
   <section id="como-funciona" class="card">
     <h2>Como funciona</h2>
     <div class="grid">
-      <div class="feature">
-        <h3 class="green">01. Cadastre</h3>
-        <p>Registre os orçamentos que sua oficina apresenta aos clientes.</p>
-      </div>
-      <div class="feature">
-        <h3 class="green">02. Acompanhe</h3>
-        <p>Identifique os orçamentos que ainda estão pendentes.</p>
-      </div>
-      <div class="feature">
-        <h3 class="green">03. Entre em contato</h3>
-        <p>Gere mensagens de acompanhamento para enviar pelo WhatsApp.</p>
-      </div>
-      <div class="feature">
-        <h3 class="green">04. Meça</h3>
-        <p>Marque os serviços recuperados e acompanhe os valores.</p>
-      </div>
+      <div class="feature"><h3 class="green">01. Cadastre</h3><p>Registre os orçamentos que sua oficina apresenta aos clientes.</p></div>
+      <div class="feature"><h3 class="green">02. Acompanhe</h3><p>Identifique os orçamentos que ainda estão pendentes.</p></div>
+      <div class="feature"><h3 class="green">03. Entre em contato</h3><p>Gere mensagens de acompanhamento para enviar pelo WhatsApp.</p></div>
+      <div class="feature"><h3 class="green">04. Meça</h3><p>Marque os serviços recuperados e acompanhe os valores.</p></div>
     </div>
   </section>
 
-  <!-- SIMULADOR -->
   <section id="simulador" class="card">
     <h2>Quanto sua oficina poderia recuperar?</h2>
     <p>Faça uma simulação usando os números da sua oficina.</p>
-
     <label>Quantos orçamentos sua oficina faz por mês?</label>
     <input id="simQuotes" type="number" min="0" value="100">
-
     <label>Qual o valor médio de cada orçamento? (R$)</label>
     <input id="simValue" type="number" min="0" step="0.01" value="500">
-
     <label>Qual percentual deseja simular como recuperação?</label>
     <select id="simRate">
-      <option value="10">10%</option>
-      <option value="15">15%</option>
-      <option value="20" selected>20%</option>
-      <option value="25">25%</option>
-      <option value="30">30%</option>
+      <option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option><option value="25">25%</option><option value="30">30%</option>
     </select>
-
     <button onclick="calculate()">Calcular potencial</button>
-
     <div class="feature">
       <small>VALOR POTENCIALMENTE RECUPERÁVEL POR MÊS</small>
       <div id="simResult" class="sim-result">R$ 10.000,00</div>
@@ -125,20 +102,15 @@ footer{text-align:center;padding:30px;color:#82978a}
   </section>
 </section>
 
-<!-- LOGIN -->
 <section id="auth" class="card hidden">
   <h2>Acesse sua oficina</h2>
   <p>Entre na sua conta ou cadastre sua oficina.</p>
-
   <label>Nome da oficina (somente para cadastro)</label>
   <input id="business" placeholder="Nome da oficina">
-
   <label>E-mail</label>
   <input id="email" type="email" placeholder="seu@email.com">
-
   <label>Senha</label>
   <input id="password" type="password" placeholder="Mínimo de 6 caracteres">
-
   <button onclick="signup()">Criar conta</button>
   <button class="secondary" onclick="login()">Entrar</button>
   <button class="secondary" onclick="showLanding()">Voltar ao início</button>
@@ -146,14 +118,12 @@ footer{text-align:center;padding:30px;color:#82978a}
   <small>No primeiro cadastro, confirme seu e-mail se o Supabase solicitar.</small>
 </section>
 
-<!-- PAINEL DA OFICINA -->
 <section id="app" class="hidden">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
     <span id="welcome"></span>
     <button class="secondary" onclick="logout()">Sair</button>
   </div>
 
-  <!-- ASSINATURA -->
   <section class="card">
     <h2>Plano VoltaVenda</h2>
     <p>Assinatura mensal: <strong class="green">R$ 49,90</strong></p>
@@ -183,19 +153,14 @@ footer{text-align:center;padding:30px;color:#82978a}
     <h2>Orçamentos cadastrados</h2>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
-        </thead>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
         <tbody id="quotes"></tbody>
       </table>
     </div>
   </section>
 </section>
 
-<footer>
-  VoltaVenda © 2026 — Gestão e recuperação de orçamentos.
-</footer>
-
+<footer>VoltaVenda © 2026 — Gestão e recuperação de orçamentos.</footer>
 </main>
 
 <script>
@@ -206,9 +171,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let records = [];
 
-function msg(id,text){
-  document.getElementById(id).textContent=text;
-}
+function msg(id,text){document.getElementById(id).textContent=text;}
 
 /* PAGAMENTO STRIPE */
 async function subscribe(){
@@ -224,11 +187,11 @@ async function subscribe(){
   paymentMessage.textContent="Preparando pagamento...";
 
   try{
-    const {data,error}=await db.functions.invoke("create-checkout");
+    const {data,error}=await db.functions.invoke("create-checkout-");
 
     if(error){
       console.error("Erro ao criar checkout:",error);
-      paymentMessage.textContent="Não foi possível iniciar o pagamento. Tente entrar novamente.";
+      paymentMessage.textContent="Falha ao iniciar pagamento. Consulte os registros da função no Supabase.";
       button.disabled=false;
       return;
     }
@@ -240,7 +203,6 @@ async function subscribe(){
     }
 
     window.location.href=data.url;
-
   }catch(error){
     console.error(error);
     paymentMessage.textContent="Erro de conexão. Tente novamente.";
@@ -254,172 +216,90 @@ function showLogin(){
   document.getElementById("auth").classList.remove("hidden");
   window.scrollTo(0,0);
 }
-
 function showLanding(){
   document.getElementById("auth").classList.add("hidden");
   document.getElementById("app").classList.add("hidden");
   document.getElementById("landing").classList.remove("hidden");
   window.scrollTo(0,0);
 }
-
 function calculate(){
   const quantity=Math.max(0,Number(document.getElementById("simQuotes").value)||0);
   const average=Math.max(0,Number(document.getElementById("simValue").value)||0);
   const rate=Number(document.getElementById("simRate").value)/100;
   const recovered=quantity*rate;
   const total=recovered*average;
-
-  document.getElementById("simResult").textContent=
-    total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-
-  document.getElementById("simDetails").textContent=
-    "Simulação de "+Math.round(recovered)+" orçamentos recuperados, de um total de "+quantity+" orçamentos mensais.";
+  document.getElementById("simResult").textContent=total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  document.getElementById("simDetails").textContent="Simulação de "+Math.round(recovered)+" orçamentos recuperados, de um total de "+quantity+" orçamentos mensais.";
 }
-
 async function signup(){
   const email=document.getElementById("email").value.trim();
   const password=document.getElementById("password").value;
   const business=document.getElementById("business").value.trim() || "Minha oficina";
-
-  if(!email || password.length<6){
-    msg("message","Informe e-mail e senha com pelo menos 6 caracteres.");
-    return;
-  }
-
+  if(!email || password.length<6){msg("message","Informe e-mail e senha com pelo menos 6 caracteres.");return;}
   msg("message","Criando conta...");
-
-  const {data,error}=await db.auth.signUp({
-    email,password,
-    options:{data:{business_name:business}}
-  });
-
+  const {data,error}=await db.auth.signUp({email,password,options:{data:{business_name:business}}});
   if(error){msg("message",error.message);return;}
-
-  if(data.session){
-    await startApp(data.session.user);
-  }else{
-    msg("message","Conta criada! Confira seu e-mail para confirmar o cadastro e depois entre.");
-  }
+  if(data.session){await startApp(data.session.user);}
+  else{msg("message","Conta criada! Confira seu e-mail para confirmar o cadastro e depois entre.");}
 }
-
 async function login(){
   const email=document.getElementById("email").value.trim();
   const password=document.getElementById("password").value;
-
   msg("message","Entrando...");
-
   const {data,error}=await db.auth.signInWithPassword({email,password});
-
   if(error){msg("message",error.message);return;}
-
   await startApp(data.user);
 }
-
 async function logout(){
-  await db.auth.signOut();
-  currentUser=null;
-  records=[];
-  document.getElementById("app").classList.add("hidden");
-  showLanding();
+  await db.auth.signOut();currentUser=null;records=[];
+  document.getElementById("app").classList.add("hidden");showLanding();
 }
-
 async function startApp(user){
   currentUser=user;
   document.getElementById("landing").classList.add("hidden");
   document.getElementById("auth").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-
-  document.getElementById("welcome").textContent=
-    "Oficina: "+(user.user_metadata.business_name || user.email);
-
+  document.getElementById("welcome").textContent="Oficina: "+(user.user_metadata.business_name || user.email);
   await loadQuotes();
 }
-
 async function loadQuotes(){
-  const {data,error}=await db.from("quotes")
-    .select("*").order("created_at",{ascending:false});
-
-  if(error){
-    msg("appmessage","Erro ao carregar: "+error.message);
-    return;
-  }
-
-  records=data || [];
-  render();
+  const {data,error}=await db.from("quotes").select("*").order("created_at",{ascending:false});
+  if(error){msg("appmessage","Erro ao carregar: "+error.message);return;}
+  records=data || [];render();
 }
-
 async function addQuote(){
   if(!currentUser)return;
-
   const customer_name=document.getElementById("customer").value.trim();
   const phone=document.getElementById("phone").value.trim();
   const service=document.getElementById("service").value.trim();
   const amount=Number(document.getElementById("value").value);
-
-  if(!customer_name || !phone || !service ||
-     document.getElementById("value").value==="" ||
-     !Number.isFinite(amount) || amount<0){
-    msg("appmessage","Preencha todos os campos corretamente.");
-    return;
+  if(!customer_name || !phone || !service || document.getElementById("value").value==="" || !Number.isFinite(amount) || amount<0){
+    msg("appmessage","Preencha todos os campos corretamente.");return;
   }
-
   msg("appmessage","Salvando...");
-
-  const {error}=await db.from("quotes").insert({
-    workshop_id:currentUser.id,
-    customer_name,phone,service,amount,status:"Pendente"
-  });
-
-  if(error){
-    msg("appmessage","Erro ao salvar: "+error.message);
-    return;
-  }
-
-  ["customer","phone","service","value"].forEach(id=>{
-    document.getElementById(id).value="";
-  });
-
-  msg("appmessage","Orçamento salvo na nuvem!");
-  await loadQuotes();
+  const {error}=await db.from("quotes").insert({workshop_id:currentUser.id,customer_name,phone,service,amount,status:"Pendente"});
+  if(error){msg("appmessage","Erro ao salvar: "+error.message);return;}
+  ["customer","phone","service","value"].forEach(id=>{document.getElementById(id).value="";});
+  msg("appmessage","Orçamento salvo na nuvem!");await loadQuotes();
 }
-
 async function changeStatus(id,status){
-  const {error}=await db.from("quotes")
-    .update({status}).eq("id",id);
-
-  if(error){
-    msg("appmessage","Erro ao atualizar: "+error.message);
-    return;
-  }
-
+  const {error}=await db.from("quotes").update({status}).eq("id",id);
+  if(error){msg("appmessage","Erro ao atualizar: "+error.message);return;}
   await loadQuotes();
 }
-
 async function removeQuote(id){
   if(!confirm("Deseja excluir este orçamento?"))return;
-
   const {error}=await db.from("quotes").delete().eq("id",id);
-
-  if(error){
-    msg("appmessage","Erro ao excluir: "+error.message);
-    return;
-  }
-
+  if(error){msg("appmessage","Erro ao excluir: "+error.message);return;}
   await loadQuotes();
 }
-
 function render(){
   const pending=records.filter(x=>x.status==="Pendente").length;
   const recovered=records.filter(x=>x.status==="Recuperado");
-
   document.getElementById("total").textContent=records.length;
   document.getElementById("pending").textContent=pending;
   document.getElementById("recovered").textContent=recovered.length;
-
-  document.getElementById("amount").textContent=
-    recovered.reduce((s,x)=>s+Number(x.amount),0)
-    .toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-
+  document.getElementById("amount").textContent=recovered.reduce((s,x)=>s+Number(x.amount),0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
   document.getElementById("quotes").innerHTML=records.map(x=>`
     <tr>
       <td>${escapeHTML(x.customer_name)}<br><small>${escapeHTML(x.phone)}</small></td>
@@ -431,34 +311,21 @@ function render(){
         <button class="secondary" onclick="changeStatus('${x.id}','${x.status==="Recuperado"?"Pendente":"Recuperado"}')">${x.status==="Recuperado"?"Voltar":"Recuperado"}</button>
         <button class="danger" onclick="removeQuote('${x.id}')">Excluir</button>
       </td>
-    </tr>
-  `).join("");
+    </tr>`).join("");
 }
-
 function escapeHTML(value){
-  return String(value ?? "").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+  return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-
 function whatsapp(phone,name,service){
   const p=decodeURIComponent(phone).replace(/\D/g,"");
   const n=decodeURIComponent(name);
   const s=decodeURIComponent(service);
   const number=p.startsWith("55")?p:"55"+p;
-
-  const message=encodeURIComponent(
-    `Olá, ${n}! Tudo bem? Estamos passando para saber se deseja seguir com o orçamento de ${s}. Podemos ajudar?`
-  );
-
+  const message=encodeURIComponent(`Olá, ${n}! Tudo bem? Estamos passando para saber se deseja seguir com o orçamento de ${s}. Podemos ajudar?`);
   window.open(`https://wa.me/${number}?text=${message}`,"_blank");
 }
-
 calculate();
-
-db.auth.getSession().then(({data})=>{
-  if(data.session)startApp(data.session.user);
-});
+db.auth.getSession().then(({data})=>{if(data.session)startApp(data.session.user);});
 </script>
 </body>
 </html>
